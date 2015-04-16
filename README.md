@@ -54,7 +54,7 @@ Methods that return a single object return that object directly:
     project = client.projects.create_in_workspace(workspace_id, { 'name': 'new project' })
     print "Created project with id: " + project['id']
 
-Methods that return multiple items (e.x. `find_all`) return a page iterator by default. See the "Collections" section
+Methods that return multiple items (e.x. `find_all`) return an item iterator by default. See the "Collections" section
 
 Options
 -------
@@ -75,12 +75,12 @@ Various options can be set globally on the `Client.DEFAULTS` object, per-client 
 * `base_url` (default: "https://app.asana.com/api/1.0"): API endpoint base URL to connect to
 * `max_retries` (default: 5): number to times to retry if API rate limit is reached or a server error occures. Rate limit retries delay until the rate limit expires, server errors exponentially backoff starting with a 1 second delay.
 * `full_payload` (default: False): return the entire JSON response instead of the 'data' propery (default for collection methods and `events.get`)
-* `fields` and `expand`: see [API documentation](http://developer.asana.com/documentation/#Options)
+* `fields` and `expand`: array of field names to include in the response, or sub-objects to expand in the response. For example `fields=['followers', 'assignee']`. See [API documentation](https://asana.com/developers/documentation/getting-started/input-output-options)
 
 Collections (methods returning an array as it's 'data' property):
 
 * `iterator_type` (default: "items"): specifies which type of iterator (or not) to return. Valid values are "items" and `None`.
-* `item_limit` (default: None): limits the number of items of a collection to return.
+* `item_limit` (default: None): limits the total number of items of a collection to return (spanning multiple requests in the case of an iterator).
 * `page_size` (default: 50): limits the number of items per page to fetch at a time.
 * `offset`: offset token returned by previous calls to the same method (in `response['next_page']['offset']`)
 
@@ -104,6 +104,8 @@ Or:
 
     for workspace in client.workspaces.find_all()
       print workspace
+
+Internally the iterator may make multiple HTTP requests, with the number of requested results per page being controlled by the `page_size` option.
 
 ### Raw API
 
