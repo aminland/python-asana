@@ -45,6 +45,20 @@ class TestClientTasks(ClientTestCase):
         responses.add(GET, 'http://app/tasks/1001', status=200, body=json.dumps(res), match_querystring=True)
         self.assertEqual(self.client.tasks.find_by_id(1001), res['data'])
 
+    def test_tasks_find_by_custom_id(self):
+        res = {
+            "data": {
+                "assignee": { "id": 8675309, "name": "Andrew Noonan" },
+                "created_at": "2012-02-22T02:06:58.158Z",
+                "external": {
+                    "id": "wombats",
+                    "data": "Wombats are short-legged"
+                },
+            }
+        }
+        responses.add(GET, 'http://app/tasks/external:wombats', status=200, body=json.dumps(res), match_querystring=True)
+        self.assertEqual(self.client.tasks.find_by_id("external:wombats"), res['data'])
+
     def test_tasks_find_by_project(self):
         res = {
             "data": [
